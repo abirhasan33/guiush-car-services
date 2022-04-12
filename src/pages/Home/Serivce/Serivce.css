@@ -1,0 +1,25 @@
+.serivces{
+    border-radius: 20px;
+    padding-bottom: 50px;
+    text-align: center;
+    box-shadow: 0px 0px 5px 5px rgba(20, 51, 191, 0.177);
+}
+.button{
+    padding: 7px 20px;
+    background-color: blue;
+    color: wheat;
+    font-size: 16px;
+    border-radius: 25px 0 25px 0;
+    font-weight: 700;
+    text-decoration: none;
+}
+.p{
+    font-weight: bold;
+    color: orange;
+    font-size: 16;
+}
+.button:hover{
+    background: blueviolet;
+    color: #ffffff;
+    box-shadow: 0 0 5px blue, 0 0 25px blue, 0 0 50px blue, 0 0 100px blue;
+}
