@@ -1,38 +1,48 @@
-import React from "react";
+import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
-import auth from '../../../firebase.init';
+import { useCreateUserWithEmailAndPassword, useUpdateProfile } from "react-firebase-hooks/auth";
+import auth from "../../../firebase.init";
 import SocialLogin from "../SocialLogin/SocialLogin";
+import Loading from "../../Shared/Heder/Loading/Loading";
 
 const Register = () => {
-    const [
-        createUserWithEmailAndPassword,
-        user,
-        loading,
-        error,
-      ] = useCreateUserWithEmailAndPassword(auth);
-    const navigate = useNavigate();
+  const [agree, setAgree] = useState(false);
+  const [createUserWithEmailAndPassword, user, loading, error] =
+    useCreateUserWithEmailAndPassword(auth, {sendEmailVerification: true});
+    const [updateProfile, updating, error1] = useUpdateProfile(auth);
 
-    const navigateLogin = () =>{
-        navigate('/login');
-    }
+  const navigate = useNavigate();
 
-    if(user){
-        navigate('/home');
-    }
-    if(error){
-        console.log(error);
-    }
+  const navigateLogin = () => {
+    navigate("/login");
+  };
 
-    const handleRegister = event =>{
-        event.preventDefault();
-        const name = event?.target?.name?.value;
-        const email = event?.target?.email?.value;
-        const password = event?.target?.password?.value;
+  if(loading || updating){
+    return <Loading></Loading>
+  }
 
-        createUserWithEmailAndPassword(email, password);
-    }
+  const handleRegister = async (event) => {
+    event.preventDefault();
+    const name = event?.target?.name?.value;
+    const email = event?.target?.email?.value;
+    const password = event?.target?.password?.value;
+    // const agree = event?.target?.terms?.checked;
+
+      createUserWithEmailAndPassword(email, password);
+      await updateProfile({ displayName: name });
+      alert('Updated profile');
+      console.log('Updet profile');
+      navigate("/home");
+
+  };
+
+  if (user) {
+    console.log(user);
+  }
+  if (error) {
+    console.log(error);
+  }
 
   return (
     <div className="container w-50 mx-auto">
@@ -41,6 +51,7 @@ const Register = () => {
         <Form.Group className="mb-3" controlId="formBasicName">
           <Form.Control
             type="text"
+            name="name"
             placeholder="Your Name"
             className="py-3"
           />
@@ -49,6 +60,7 @@ const Register = () => {
         <Form.Group className="mb-3" controlId="formBasicEmail">
           <Form.Control
             type="email"
+            name="email"
             placeholder="Enter email"
             required
             className="py-3"
@@ -58,21 +70,25 @@ const Register = () => {
         <Form.Group className="mb-3" controlId="formBasicPassword">
           <Form.Control
             type="password"
+            name="password"
             placeholder="Password"
             className="py-3"
             required
           />
         </Form.Group>
-        <Form.Group className="mb-3" controlId="formBasicCheckbox">
-          <Form.Check type="checkbox" label="Check me out" />
+        <Form.Group className="mb-3 d-flex" controlId="formBasicCheckbox">
+          <Form.Check onClick={()=> setAgree(!agree)} type="checkbox" name="terms" id="terms" />
+          <label htmlFor="terms" className={agree ? 'text-primary ps-3' : 'text-danger ps-4'}>Accept Grenius Car Terms and Conditons</label>
         </Form.Group>
-        <Button variant="primary w-25" type="submit">
+        {/* <input className="px-3 my-3" type="checkbox" name="terms" id="terms" />
+        <label htmlFor="terms">Accept Grenius Car Terms and Conditons</label> */}
+        <Button disabled={!agree} variant="primary w-75 d-block mx-auto py-2 my-3" type="submit">
           Submit
         </Button>
       </Form>
-      <p>
+      <p className="text-center">
         <small>Alredy an account? </small>{" "}
-        <Link to="/login" className="text-danger" onClick={navigateLogin}>
+        <Link to="/login" className="text-primary" onClick={navigateLogin}>
           Please Login
         </Link>
       </p>
